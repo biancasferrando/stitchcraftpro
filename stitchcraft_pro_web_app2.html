@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StitchCraft Pro - Embroidery Organizer</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf3f2',
+                            100: '#fce4e1',
+                            200: '#f9ccc7',
+                            300: '#f4a79e',
+                            400: '#ec786a',
+                            500: '#e05343',
+                            600: '#cd3828',
+                            700: '#ad2b1e',
+                            800: '#8f271d',
+                            900: '#77261e',
+                        },
+                        sage: {
+                            50: '#f4f7f4',
+                            100: '#e3ebe4',
+                            200: '#c7d7c9',
+                            300: '#a2bfa6',
+                            400: '#7a9f80',
+                            500: '#5c8362',
+                            600: '#48684d',
+                            700: '#3a533e',
+                            800: '#314434',
+                            900: '#2a392d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 0.7);
+        }
+        .color-swatch-border {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200 selection:bg-brand-500 selection:text-white">
+
+    <div id="app" class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Desktop Sidebar Navigation -->
+        <aside class="hidden md:flex md:w-64 fixed inset-y-0 left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-30 flex-col justify-between p-4 shadow-sm">
+            <div class="space-y-6">
+                <!-- App Logo Branding -->
+                <div class="flex items-center gap-3 px-2 py-1">
+                    <div class="w-10 h-10 rounded-2xl bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
+                        <i data-lucide="scissors" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base tracking-tight text-gray-900 dark:text-white leading-tight">StitchCraft</h1>
+                        <p class="text-[11px] font-medium text-brand-500 uppercase tracking-wider">Embroidery Studio</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1.5" id="desktop-nav">
+                    <button onclick="switchTab('threads')" id="desk-tab-threads" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all">
+                        <i data-lucide="palette" class="w-4 h-4"></i>
+                        <span>Floss & Threads</span>
+                    </button>
+                    <button onclick="switchTab('converter')" id="desk-tab-converter" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all">
+                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                        <span>DMC ↔ Cosmo</span>
+                    </button>
+                    <button onclick="switchTab('projects')" id="desk-tab-projects" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all">
+                        <i data-lucide="frame" class="w-4 h-4"></i>
+                        <span>Projects</span>
+                    </button>
+                    <button onclick="switchTab('supplies')" id="desk-tab-supplies" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all">
+                        <i data-lucide="grid" class="w-4 h-4"></i>
+                        <span>Fabrics & Tools</span>
+                    </button>
+                    <button onclick="switchTab('shopping')" id="desk-tab-shopping" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                            <span>Shopping List</span>
+                        </div>
+                        <span id="desk-shopping-badge" class="bg-brand-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold hidden">0</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="space-y-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+                <button onclick="openCloudModal()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="cloud" class="w-4 h-4 text-brand-500"></i>
+                        <span>Cloud & Backup</span>
+                    </div>
+                    <span id="desk-cloud-status" class="text-[10px] text-gray-400 font-medium">Local</span>
+                </button>
+                <button onclick="toggleDarkMode()" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+                    <span id="theme-text">Dark Theme</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Viewport -->
+        <main class="flex-1 md:ml-64 min-h-screen pb-24 md:pb-8 flex flex-col">
+            
+            <header class="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 md:px-8 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 md:hidden">
+                    <div class="w-8 h-8 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-md">
+                        <i data-lucide="scissors" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-bold text-sm tracking-tight">StitchCraft Pro</span>
+                </div>
+
+                <!-- Search Input Bar -->
+                <div class="flex-1 max-w-md relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Search thread code, color, fabric, project..." class="w-full pl-9 pr-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-gray-900 outline-none transition">
+                </div>
+
+                <!-- Top Header Actions -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openCloudModal()" class="md:hidden p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <i data-lucide="cloud" class="w-5 h-5 text-brand-500"></i>
+                    </button>
+                    <button onclick="toggleDarkMode()" class="md:hidden p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <i id="mobile-theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="p-4 md:p-8 flex-1 max-w-7xl w-full mx-auto">
+                
+                <!-- TAB 1: THREADS / FLOSS CATALOG -->
+                <section id="view-threads" class="tab-view space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Floss & Thread Inventory</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Manage your DMC and Cosmo (Lecien) skeins and wishlist.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openAddThreadModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-brand-500/20 transition flex items-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Custom Thread
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Catalog Filters -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-3">
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                            <button onclick="setBrandFilter('ALL')" id="filter-brand-ALL" class="brand-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">All Brands</button>
+                            <button onclick="setBrandFilter('DMC')" id="filter-brand-DMC" class="brand-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">DMC</button>
+                            <button onclick="setBrandFilter('Cosmo')" id="filter-brand-Cosmo" class="brand-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">Cosmo</button>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="setStashFilter('ALL')" id="filter-stash-ALL" class="stash-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">All Items</button>
+                            <button onclick="setStashFilter('IN_STASH')" id="filter-stash-IN_STASH" class="stash-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">In Stash</button>
+                            <button onclick="setStashFilter('WISHLIST')" id="filter-stash-WISHLIST" class="stash-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">Wishlist</button>
+                        </div>
+                    </div>
+
+                    <!-- Thread Grid Container -->
+                    <div id="thread-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4"></div>
+                </section>
+
+                <section id="view-converter" class="tab-view hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">DMC ↔ Cosmo Color Converter</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Search and cross-reference equivalent floss numbers across brands.</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 md:p-6 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+                        <div class="relative max-w-lg">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="converter-search" oninput="renderConverter(this.value)" placeholder="Enter DMC or Cosmo code (e.g. 310, 600, 311, 2301)..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs border border-transparent focus:border-brand-500 outline-none">
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-400 uppercase tracking-wider font-semibold">
+                                        <th class="py-3 px-2">DMC Thread</th>
+                                        <th class="py-3 px-2">Cosmo Equivalent</th>
+                                        <th class="py-3 px-2">Match Quality</th>
+                                        <th class="py-3 px-2 text-right">Quick Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="converter-table-body" class="divide-y divide-gray-100 dark:divide-gray-800 font-medium"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="view-projects" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Embroidery Projects</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Track active patterns, deadlines, hoops, and required thread progress.</p>
+                        </div>
+                        <button onclick="openAddProjectModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-brand-500/20 transition flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Project
+                        </button>
+                    </div>
+
+                    <!-- Project Status Filters -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                        <button onclick="setProjectStatusFilter('ALL')" id="pfilter-ALL" class="pstatus-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">All Projects</button>
+                        <button onclick="setProjectStatusFilter('In Progress')" id="pfilter-In Progress" class="pstatus-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">In Progress</button>
+                        <button onclick="setProjectStatusFilter('Planned')" id="pfilter-Planned" class="pstatus-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">Planned</button>
+                        <button onclick="setProjectStatusFilter('Completed')" id="pfilter-Completed" class="pstatus-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition">Completed</button>
+                    </div>
+
+                    <!-- Projects Grid -->
+                    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </section>
+
+                <section id="view-supplies" class="tab-view hidden space-y-8">
+                    <!-- Fabrics Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Fabric Stash</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Aida counts, Linen, Evenweave cuts, and colorways.</p>
+                            </div>
+                            <button onclick="openAddSupplyModal('fabric')" class="bg-sage-500 hover:bg-sage-600 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Fabric
+                            </button>
+                        </div>
+                        <div id="fabrics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <!-- Equipment & Tools Section -->
+                    <div class="space-y-4 border-t border-gray-200 dark:border-gray-800 pt-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Hoops, Needles & Tools</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Track hoop diameters, Q-Snaps, needles, and bobbins.</p>
+                            </div>
+                            <button onclick="openAddSupplyModal('tool')" class="bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add Tool
+                            </button>
+                        </div>
+                        <div id="tools-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </section>
+
+                <section id="view-shopping" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Shopping & Restock List</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Auto-generated from active project requirements & wishlist items.</p>
+                        </div>
+                        <button onclick="clearShoppingList()" class="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 px-3.5 py-2 rounded-xl font-bold text-xs transition">
+                            Clear Wishlist Items
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 md:p-6 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+                        <div id="shopping-list-container" class="divide-y divide-gray-100 dark:divide-gray-800"></div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 z-40 px-2 py-2 flex justify-around items-center">
+            <button onclick="switchTab('threads')" id="mob-tab-threads" class="mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition">
+                <i data-lucide="palette" class="w-5 h-5"></i>
+                <span>Threads</span>
+            </button>
+            <button onclick="switchTab('converter')" id="mob-tab-converter" class="mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition">
+                <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                <span>Convert</span>
+            </button>
+            <button onclick="switchTab('projects')" id="mob-tab-projects" class="mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition">
+                <i data-lucide="frame" class="w-5 h-5"></i>
+                <span>Projects</span>
+            </button>
+            <button onclick="switchTab('supplies')" id="mob-tab-supplies" class="mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition">
+                <i data-lucide="grid" class="w-5 h-5"></i>
+                <span>Supplies</span>
+            </button>
+            <button onclick="switchTab('shopping')" id="mob-tab-shopping" class="mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition relative">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                <span>Shop</span>
+                <span id="mob-shopping-badge" class="absolute top-0 right-1 bg-brand-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 transition-opacity duration-200 opacity-0">
+        <div id="modal-box" class="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 dark:border-gray-800 transition-all duration-200 scale-95 overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 id="modal-title" class="font-bold text-base text-gray-900 dark:text-white">Modal Header</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="p-5 overflow-y-auto space-y-4 flex-1"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-6 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <script>
+        const DEFAULT_THREADS = [
+            { id: 'dmc-310', brand: 'DMC', code: '310', name: 'Black', hex: '#000000', qty: 3, wishlist: false },
+            { id: 'dmc-b5200', brand: 'DMC', code: 'B5200', name: 'Snow White', hex: '#FFFFFF', qty: 2, wishlist: false },
+            { id: 'dmc-666', brand: 'DMC', code: '666', name: 'Bright Red', hex: '#D6001C', qty: 1, wishlist: false },
+            { id: 'dmc-321', brand: 'DMC', code: '321', name: 'Red', hex: '#C21B38', qty: 0, wishlist: true },
+            { id: 'dmc-815', brand: 'DMC', code: '815', name: 'Medium Garnet', hex: '#710B22', qty: 2, wishlist: false },
+            { id: 'dmc-700', brand: 'DMC', code: '700', name: 'Bright Green', hex: '#00873D', qty: 1, wishlist: false },
+            { id: 'dmc-987', brand: 'DMC', code: '987', name: 'Dark Forest Green', hex: '#325C36', qty: 0, wishlist: true },
+            { id: 'dmc-796', brand: 'DMC', code: '796', name: 'Dark Royal Blue', hex: '#112D73', qty: 4, wishlist: false },
+            { id: 'dmc-3843', brand: 'DMC', code: '3843', name: 'Electric Blue', hex: '#0083B3', qty: 1, wishlist: false },
+            { id: 'dmc-725', brand: 'DMC', code: '725', name: 'Topaz Yellow', hex: '#FDCB00', qty: 2, wishlist: false },
+            { id: 'dmc-600', brand: 'DMC', code: '600', name: 'Very Dark Cranberry', hex: '#C61B58', qty: 0, wishlist: true },
+            { id: 'dmc-311', brand: 'DMC', code: '311', name: 'Medium Navy Blue', hex: '#183B5B', qty: 1, wishlist: false },
+            
+            // Cosmo (Lecien) Threads
+            { id: 'cosmo-600', brand: 'Cosmo', code: '600', name: 'Pure Jet Black', hex: '#111111', qty: 2, wishlist: false },
+            { id: 'cosmo-2500', brand: 'Cosmo', code: '2500', name: 'Ultra White', hex: '#FAFAFA', qty: 1, wishlist: false },
+            { id: 'cosmo-2301', brand: 'Cosmo', code: '2301', name: 'Crimson Cherry', hex: '#CB1D31', qty: 0, wishlist: true },
+            { id: 'cosmo-311', brand: 'Cosmo', code: '311', name: 'Soft Sage Green', hex: '#638C6C', qty: 3, wishlist: false },
+            { id: 'cosmo-800', brand: 'Cosmo', code: '800', name: 'Deep Cobalt', hex: '#13356E', qty: 1, wishlist: false },
+            { id: 'cosmo-700', brand: 'Cosmo', code: '700', name: 'Saffron Gold', hex: '#E5A212', qty: 0, wishlist: false }
+        ];
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let currentVaultCode = localStorage.getItem('stitchcraft_vault_code') || null;
+        let unsubscribeVaultListener = null;
+
+        async function initFirebaseSync() {
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'stitchcraft-pro';
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                
+                if (!firebaseConfig) {
+                    updateCloudStatusUI();
+                    return;
+                }
+
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const { getAuth, signInAnonymously, signInWithCustomToken } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (initialAuthToken) {
+                    const userCred = await signInWithCustomToken(auth, initialAuthToken);
+                    currentUser = userCred.user;
+                } else {
+                    const userCred = await signInAnonymously(auth);
+                    currentUser = userCred.user;
+                }
+
+                updateCloudStatusUI();
+
+                if (currentVaultCode) {
+                    connectToVault(currentVaultCode, false);
+                }
+            } catch (err) {
+                console.warn("Firebase sync running in offline/local mode:", err);
+                updateCloudStatusUI();
+            }
+        }
+
+        async function createNewVault() {
+            const code = 'STITCH-' + Math.floor(1000 + Math.random() * 9000);
+            currentVaultCode = code;
+            localStorage.setItem('stitchcraft_vault_code', code);
+
+            if (!db || !currentUser) {
+                updateCloudStatusUI();
+                showToast(`Vault created locally: ${code}`);
+                openCloudModal();
+                return code;
+            }
+
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'stitchcraft-pro';
+            
+            try {
+                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const vaultRef = doc(db, 'artifacts', appId, 'public', 'data', 'vaults', code);
+                await setDoc(vaultRef, {
+                    vaultCode: code,
+                    updatedAt: new Date().toISOString(),
+                    appData: JSON.stringify(appState)
+                });
+                connectToVault(code, false);
+                showToast(`Cloud Vault active: ${code}`);
+            } catch (e) {
+                console.error("Error creating cloud vault:", e);
+                showToast(`Local Vault active: ${code}`);
+            }
+            openCloudModal();
+            return code;
+        }
+
+        async function joinVaultByCode(codeToJoin) {
+            if (!codeToJoin) return;
+            const cleanCode = codeToJoin.trim().toUpperCase();
+            if (!cleanCode) return;
+
+            currentVaultCode = cleanCode;
+            localStorage.setItem('stitchcraft_vault_code', cleanCode);
+
+            if (!db || !currentUser) {
+                updateCloudStatusUI();
+                showToast(`Connected to Vault: ${cleanCode}`);
+                openCloudModal();
+                return;
+            }
+
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'stitchcraft-pro';
+
+            try {
+                const { doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const vaultRef = doc(db, 'artifacts', appId, 'public', 'data', 'vaults', cleanCode);
+                const snap = await getDoc(vaultRef);
+
+                if (snap.exists()) {
+                    connectToVault(cleanCode, true);
+                    showToast(`Connected to Cloud Vault: ${cleanCode}`);
+                } else {
+                    await setDoc(vaultRef, {
+                        vaultCode: cleanCode,
+                        updatedAt: new Date().toISOString(),
+                        appData: JSON.stringify(appState)
+                    });
+                    connectToVault(cleanCode, false);
+                    showToast(`Created new vault: ${cleanCode}`);
+                }
+            } catch (e) {
+                console.error("Error joining vault:", e);
+                showToast(`Connected to Vault: ${cleanCode}`);
+            }
+            openCloudModal();
+        }
+
+        async function connectToVault(code) {
+            if (!db || !currentUser) {
+                updateCloudStatusUI();
+                return;
+            }
+            if (unsubscribeVaultListener) unsubscribeVaultListener();
+
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'stitchcraft-pro';
+
+            try {
+                const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const vaultRef = doc(db, 'artifacts', appId, 'public', 'data', 'vaults', code);
+
+                unsubscribeVaultListener = onSnapshot(vaultRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data && data.appData) {
+                            try {
+                                const parsed = JSON.parse(data.appData);
+                                if (JSON.stringify(parsed) !== JSON.stringify(appState)) {
+                                    appState = { ...appState, ...parsed };
+                                    localStorage.setItem('stitchcraft_pro_app', JSON.stringify(appState));
+                                    renderView();
+                                    updateShoppingBadges();
+                                }
+                            } catch(e) {
+                                console.error("Error parsing synced vault data:", e);
+                            }
+                        }
+                    }
+                }, (err) => console.error("Vault listener error:", err));
+            } catch (e) {
+                console.error("Error connecting to vault listener:", e);
+            }
+
+            updateCloudStatusUI();
+        }
+
+        async function pushStateToVault() {
+            if (!db || !currentUser || !currentVaultCode) return;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'stitchcraft-pro';
+
+            try {
+                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+                const vaultRef = doc(db, 'artifacts', appId, 'public', 'data', 'vaults', currentVaultCode);
+                await setDoc(vaultRef, {
+                    vaultCode: currentVaultCode,
+                    updatedAt: new Date().toISOString(),
+                    appData: JSON.stringify(appState)
+                });
+            } catch (e) {
+                console.error("Error pushing state to vault:", e);
+            }
+        }
+
+        function disconnectCloudVault() {
+            if (unsubscribeVaultListener) unsubscribeVaultListener();
+            currentVaultCode = null;
+            localStorage.removeItem('stitchcraft_vault_code');
+            updateCloudStatusUI();
+            showToast("Disconnected from Vault");
+            openCloudModal();
+        }
+
+        function updateCloudStatusUI() {
+            const statusText = currentVaultCode ? currentVaultCode : (db ? 'Cloud Ready' : 'Local');
+            const statusEl = document.getElementById('desk-cloud-status');
+            if (statusEl) {
+                statusEl.textContent = statusText;
+                if (currentVaultCode) {
+                    statusEl.className = 'text-[10px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full';
+                } else {
+                    statusEl.className = 'text-[10px] text-gray-400 font-medium';
+                }
+            }
+        }
+
+        window.saveToCloudVault = createNewVault;
+        window.getCloudVaultId = () => currentVaultCode;
+        window.disconnectCloudVault = disconnectCloudVault;
+        window.isCloudConnected = () => !!currentVaultCode;
+
+        const CONVERTER_MAP = [
+            { dmc: '310', cosmo: '600', match: 'Exact (100%)' },
+            { dmc: 'B5200', cosmo: '2500', match: 'Exact (100%)' },
+            { dmc: '666', cosmo: '2301', match: 'Very Close (95%)' },
+            { dmc: '987', cosmo: '311', match: 'Close Match (90%)' },
+            { dmc: '796', cosmo: '800', match: 'Exact (100%)' },
+            { dmc: '725', cosmo: '700', match: 'Very Close (95%)' }
+        ];
+
+        const DEFAULT_PROJECTS = [
+            {
+                id: 'proj-1',
+                title: 'Botanical Garden Sampler',
+                status: 'In Progress',
+                progress: 65,
+                targetDate: '2026-11-15',
+                fabric: '14ct White Aida (10" x 10")',
+                hoop: '8" Wooden Hoop',
+                threads: ['DMC 310', 'DMC 700', 'DMC 725', 'DMC 3843'],
+                completedThreads: ['DMC 310', 'DMC 700'],
+                notes: 'Focusing on French knots in the center floral bouquet.'
+            },
+            {
+                id: 'proj-2',
+                title: 'Midnight Celestial Cat',
+                status: 'Planned',
+                progress: 0,
+                targetDate: '2026-12-25',
+                fabric: '28ct Navy Linen (12" x 14")',
+                hoop: '10" Flexi Hoop',
+                threads: ['DMC 310', 'DMC B5200', 'DMC 796', 'Cosmo 700'],
+                completedThreads: [],
+                notes: 'Holiday gift for Sarah. Needs metallic gold thread highlight.'
+            }
+        ];
+
+        const DEFAULT_FABRICS = [
+            { id: 'fab-1', count: '14ct Aida', color: 'White', dimensions: '15" x 18"', qty: 3 },
+            { id: 'fab-2', count: '28ct Linen', color: 'Raw Natural', dimensions: '12" x 14"', qty: 1 }
+        ];
+
+        const DEFAULT_TOOLS = [
+            { id: 'tool-1', type: 'Hoop', name: '8" Beechwood Round Hoop', qty: 2 },
+            { id: 'tool-2', type: 'Needle', name: 'Size 24 Tapestry Needles (Pack of 6)', qty: 1 }
+        ];
+
+        let appState = {
+            threads: DEFAULT_THREADS,
+            projects: DEFAULT_PROJECTS,
+            fabrics: DEFAULT_FABRICS,
+            tools: DEFAULT_TOOLS,
+            currentTab: 'threads',
+            brandFilter: 'ALL',
+            stashFilter: 'ALL',
+            projectStatusFilter: 'ALL',
+            searchQuery: '',
+            darkMode: false
+        };
+
+        function initApp() {
+            const saved = localStorage.getItem('stitchcraft_pro_app');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState = { ...appState, ...parsed };
+                } catch(e) {
+                    console.error("Failed to parse local storage data:", e);
+                }
+            }
+
+            if (appState.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            switchTab(appState.currentTab || 'threads');
+            updateShoppingBadges();
+            safeCreateIcons();
+        }
+
+        function saveState() {
+            localStorage.setItem('stitchcraft_pro_app', JSON.stringify(appState));
+            updateShoppingBadges();
+            if (currentVaultCode) {
+                pushStateToVault();
+            }
+        }
+
+        function safeCreateIcons() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl text-xs font-bold text-white shadow-xl transform transition-all duration-300 translate-y-2 opacity-0 flex items-center gap-2 pointer-events-auto ${type === 'error' ? 'bg-red-500' : 'bg-sage-600'}`;
+            toast.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle'}" class="w-4 h-4"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            safeCreateIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function switchTab(tabId) {
+            appState.currentTab = tabId;
+            saveState();
+
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            const view = document.getElementById(`view-${tabId}`);
+            if (view) view.classList.remove('hidden');
+
+            // Update Desktop Nav styles
+            document.querySelectorAll('#desktop-nav .nav-item').forEach(btn => {
+                btn.className = 'nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800';
+            });
+            const activeDeskBtn = document.getElementById(`desk-tab-${tabId}`);
+            if (activeDeskBtn) {
+                activeDeskBtn.className = 'nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all bg-brand-500 text-white shadow-md shadow-brand-500/20';
+            }
+
+            // Update Mobile Nav styles
+            document.querySelectorAll('.mob-nav-item').forEach(btn => {
+                btn.className = 'mob-nav-item flex flex-col items-center gap-1 text-[10px] font-semibold p-1 transition text-gray-400';
+            });
+            const activeMobBtn = document.getElementById(`mob-tab-${tabId}`);
+            if (activeMobBtn) {
+                activeMobBtn.className = 'mob-nav-item flex flex-col items-center gap-1 text-[10px] font-extrabold p-1 transition text-brand-500';
+            }
+
+            renderView();
+        }
+
+        function renderView() {
+            if (appState.currentTab === 'threads') renderThreads();
+            if (appState.currentTab === 'converter') renderConverter(document.getElementById('converter-search')?.value || '');
+            if (appState.currentTab === 'projects') renderProjects();
+            if (appState.currentTab === 'supplies') renderSupplies();
+            if (appState.currentTab === 'shopping') renderShopping();
+            safeCreateIcons();
+        }
+
+        function renderThreads() {
+            const grid = document.getElementById('thread-grid');
+            if (!grid) return;
+
+            // Update filter chips styling
+            ['ALL', 'DMC', 'Cosmo'].forEach(b => {
+                const chip = document.getElementById(`filter-brand-${b}`);
+                if (chip) {
+                    chip.className = `brand-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition ${appState.brandFilter === b ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`;
+                }
+            });
+
+            ['ALL', 'IN_STASH', 'WISHLIST'].forEach(s => {
+                const chip = document.getElementById(`filter-stash-${s}`);
+                if (chip) {
+                    chip.className = `stash-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition ${appState.stashFilter === s ? 'bg-sage-500 text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`;
+                }
+            });
+
+            let filtered = appState.threads.filter(t => {
+                if (appState.brandFilter !== 'ALL' && t.brand !== appState.brandFilter) return false;
+                if (appState.stashFilter === 'IN_STASH' && t.qty <= 0) return false;
+                if (appState.stashFilter === 'WISHLIST' && !t.wishlist) return false;
+                if (appState.searchQuery) {
+                    const q = appState.searchQuery.toLowerCase();
+                    return t.code.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.brand.toLowerCase().includes(q);
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400 text-xs">No floss matching your criteria.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(t => `
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-3 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between space-y-3 relative group">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${t.brand === 'DMC' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'}">${t.brand}</span>
+                            <button onclick="toggleThreadWishlist('${t.id}')" class="text-gray-300 hover:text-amber-400 transition ${t.wishlist ? 'text-amber-400 fill-amber-400' : ''}">
+                                <i data-lucide="star" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="w-full h-12 rounded-xl color-swatch-border mb-2 flex items-center justify-center font-bold text-white shadow-inner text-shadow" style="background-color: ${t.hex};">
+                            <span class="drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] text-xs font-mono tracking-wider">${t.code}</span>
+                        </div>
+                        <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate">${t.name}</h4>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-1.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                        <button onclick="updateThreadQty('${t.id}', -1)" class="w-6 h-6 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-bold flex items-center justify-center text-xs shadow-sm">-</button>
+                        <span class="text-xs font-extrabold ${t.qty > 0 ? 'text-gray-900 dark:text-white' : 'text-red-500'}">${t.qty} skein${t.qty !== 1 ? 's' : ''}</span>
+                        <button onclick="updateThreadQty('${t.id}', 1)" class="w-6 h-6 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-bold flex items-center justify-center text-xs shadow-sm">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateThreadQty(id, delta) {
+            const thread = appState.threads.find(t => t.id === id);
+            if (thread) {
+                thread.qty = Math.max(0, thread.qty + delta);
+                if (thread.qty > 0) thread.wishlist = false;
+                saveState();
+                renderView();
+            }
+        }
+
+        function toggleThreadWishlist(id) {
+            const thread = appState.threads.find(t => t.id === id);
+            if (thread) {
+                thread.wishlist = !thread.wishlist;
+                saveState();
+                renderView();
+                showToast(thread.wishlist ? `Added ${thread.brand} ${thread.code} to Wishlist` : 'Removed from Wishlist');
+            }
+        }
+
+        function renderConverter(query = '') {
+            const tbody = document.getElementById('converter-table-body');
+            if (!tbody) return;
+
+            let matches = CONVERTER_MAP.filter(m => {
+                if (!query) return true;
+                const q = query.toLowerCase().trim();
+                return m.dmc.toLowerCase().includes(q) || m.cosmo.toLowerCase().includes(q);
+            });
+
+            if (matches.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-gray-400">No converter matches found for "${query}".</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = matches.map(m => {
+                const dmcThread = appState.threads.find(t => t.brand === 'DMC' && t.code === m.dmc);
+                const cosmoThread = appState.threads.find(t => t.brand === 'Cosmo' && t.code === m.cosmo);
+
+                return `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+                        <td class="py-3 px-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded-full border border-black/10" style="background-color: ${dmcThread?.hex || '#666'}"></div>
+                                <span class="font-extrabold text-gray-900 dark:text-white">DMC ${m.dmc}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded-full border border-black/10" style="background-color: ${cosmoThread?.hex || '#666'}"></div>
+                                <span class="font-extrabold text-sage-600 dark:text-sage-400">Cosmo ${m.cosmo}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">${m.match}</span>
+                        </td>
+                        <td class="py-3 px-2 text-right space-x-1">
+                            <button onclick="quickAddThreadToStash('DMC', '${m.dmc}')" class="px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-[10px] font-bold transition">
+                                + DMC Stash
+                            </button>
+                            <button onclick="quickAddThreadToStash('Cosmo', '${m.cosmo}')" class="px-2.5 py-1 bg-sage-500 hover:bg-sage-600 text-white rounded-lg text-[10px] font-bold transition">
+                                + Cosmo Stash
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function quickAddThreadToStash(brand, code) {
+            let thread = appState.threads.find(t => t.brand === brand && t.code === code);
+            if (thread) {
+                thread.qty += 1;
+            } else {
+                appState.threads.push({
+                    id: `${brand.toLowerCase()}-${code.toLowerCase()}`,
+                    brand,
+                    code,
+                    name: `${brand} ${code}`,
+                    hex: brand === 'DMC' ? '#C21B38' : '#638C6C',
+                    qty: 1,
+                    wishlist: false
+                });
+            }
+            saveState();
+            showToast(`Added ${brand} ${code} to Stash!`);
+        }
+
+        function renderProjects() {
+            const grid = document.getElementById('projects-grid');
+            if (!grid) return;
+
+            ['ALL', 'In Progress', 'Planned', 'Completed'].forEach(s => {
+                const chip = document.getElementById(`pfilter-${s}`);
+                if (chip) {
+                    chip.className = `pstatus-chip px-3 py-1.5 rounded-lg text-xs font-semibold transition ${appState.projectStatusFilter === s ? 'bg-brand-500 text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200'}`;
+                }
+            });
+
+            let filtered = appState.projects.filter(p => {
+                if (appState.projectStatusFilter !== 'ALL' && p.status !== appState.projectStatusFilter) return false;
+                if (appState.searchQuery) {
+                    const q = appState.searchQuery.toLowerCase();
+                    return p.title.toLowerCase().includes(q) || p.fabric.toLowerCase().includes(q);
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400 text-xs">No projects found. Tap "New Project" to create one.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col justify-between space-y-4 hover:border-brand-500/50 transition">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                                p.status === 'Completed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                                p.status === 'In Progress' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                                'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                            }">${p.status}</span>
+                            <span class="text-[10px] text-gray-400 font-medium">Target: ${p.targetDate || 'None'}</span>
+                        </div>
+                        <h3 class="font-bold text-base text-gray-900 dark:text-white leading-snug">${p.title}</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${p.fabric} • ${p.hoop}</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px] font-bold">
+                            <span class="text-gray-500">Stitch Progress</span>
+                            <span class="text-brand-500">${p.progress}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-brand-500 h-2 rounded-full transition-all duration-300" style="width: ${p.progress}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <span class="text-[11px] text-gray-400 font-medium">${p.threads?.length || 0} required threads</span>
+                        <button onclick="openProjectDetailModal('${p.id}')" class="text-xs font-extrabold text-brand-500 hover:underline">
+                            View Details →
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSupplies() {
+            const fGrid = document.getElementById('fabrics-grid');
+            const tGrid = document.getElementById('tools-grid');
+
+            if (fGrid) {
+                fGrid.innerHTML = appState.fabrics.map(f => `
+                    <div class="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-sage-600 dark:text-sage-400 uppercase tracking-wider">${f.count}</span>
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white">${f.color}</h4>
+                            <p class="text-xs text-gray-400">${f.dimensions}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-extrabold text-gray-900 dark:text-white">${f.qty} cut${f.qty !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (tGrid) {
+                tGrid.innerHTML = appState.tools.map(t => `
+                    <div class="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${t.type}</span>
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white">${t.name}</h4>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-extrabold text-gray-900 dark:text-white">Qty: ${t.qty}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderShopping() {
+            const container = document.getElementById('shopping-list-container');
+            if (!container) return;
+
+            // Gather wishlist threads
+            const wishlistThreads = appState.threads.filter(t => t.wishlist || t.qty === 0);
+
+            if (wishlistThreads.length === 0) {
+                container.innerHTML = `<div class="py-12 text-center text-gray-400 text-xs">Your shopping list is currently empty! All required skeins are in stock.</div>`;
+                return;
+            }
+
+            container.innerHTML = wishlistThreads.map(t => `
+                <div class="py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg border border-black/10 flex items-center justify-center font-mono text-[10px] text-white font-bold" style="background-color: ${t.hex}">
+                            ${t.code}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xs text-gray-900 dark:text-white">${t.brand} ${t.code} - ${t.name}</h4>
+                            <p class="text-[10px] text-red-500 font-semibold">Out of Stock (0 skeins)</p>
+                        </div>
+                    </div>
+                    <button onclick="restockThread('${t.id}')" class="bg-sage-500 hover:bg-sage-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Restock +1
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function restockThread(id) {
+            const t = appState.threads.find(x => x.id === id);
+            if (t) {
+                t.qty += 1;
+                t.wishlist = false;
+                saveState();
+                renderView();
+                showToast(`Restocked ${t.brand} ${t.code}!`);
+            }
+        }
+
+        function clearShoppingList() {
+            appState.threads.forEach(t => t.wishlist = false);
+            saveState();
+            renderView();
+            showToast('Wishlist items cleared.');
+        }
+
+        function updateShoppingBadges() {
+            const count = appState.threads.filter(t => t.wishlist || t.qty === 0).length;
+            ['desk-shopping-badge', 'mob-shopping-badge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (count > 0) {
+                        el.textContent = count;
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        function openModal(title, contentHtml) {
+            const backdrop = document.getElementById('modal-backdrop');
+            const box = document.getElementById('modal-box');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = contentHtml;
+
+            safeCreateIcons();
+            backdrop.classList.remove('hidden');
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const backdrop = document.getElementById('modal-backdrop');
+            const box = document.getElementById('modal-box');
+            backdrop.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => backdrop.classList.add('hidden'), 200);
+        }
+
+        function openAddThreadModal() {
+            openModal('Add Custom Floss Skein', `
+                <form onsubmit="handleAddThreadSubmit(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Brand</label>
+                        <select id="m-brand" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-transparent font-semibold">
+                            <option value="DMC">DMC</option>
+                            <option value="Cosmo">Cosmo (Lecien)</option>
+                            <option value="Anchor">Anchor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Color Code Number</label>
+                        <input type="text" id="m-code" required placeholder="e.g. 310 or B5200" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-transparent">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Shade Name</label>
+                        <input type="text" id="m-name" required placeholder="e.g. Black" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-transparent">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Color Swatch Hex</label>
+                            <input type="color" id="m-hex" value="#e05343" class="w-full h-10 rounded-xl cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Initial Skein Quantity</label>
+                            <input type="number" id="m-qty" value="1" min="0" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-transparent">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-brand-500 text-white font-bold rounded-xl hover:bg-brand-600 transition mt-2">
+                        Save Thread to Stash
+                    </button>
+                </form>
+            `);
+        }
+
+        function handleAddThreadSubmit(e) {
+            e.preventDefault();
+            const brand = document.getElementById('m-brand').value;
+            const code = document.getElementById('m-code').value.trim();
+            const name = document.getElementById('m-name').value.trim();
+            const hex = document.getElementById('m-hex').value;
+            const qty = parseInt(document.getElementById('m-qty').value) || 0;
+
+            appState.threads.unshift({
+                id: `${brand.toLowerCase()}-${code.toLowerCase()}-${Date.now()}`,
+                brand,
+                code,
+                name,
+                hex,
+                qty,
+                wishlist: false
+            });
+
+            saveState();
+            closeModal();
+            renderView();
+            showToast(`Added ${brand} ${code} to stash!`);
+        }
+
+        function openAddProjectModal() {
+            openModal('Create New Embroidery Project', `
+                <form onsubmit="handleAddProjectSubmit(event)" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Project Pattern Title</label>
+                        <input type="text" id="p-title" required placeholder="e.g. Floral Meadow" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <select id="p-status" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl font-semibold">
+                                <option value="In Progress">In Progress</option>
+                                <option value="Planned">Planned</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Target Finish Date</label>
+                            <input type="date" id="p-date" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Fabric Specifications</label>
+                        <input type="text" id="p-fabric" placeholder="e.g. 14ct White Aida (10x10)" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Hoop Size & Type</label>
+                        <input type="text" id="p-hoop" placeholder="e.g. 8 inch Wooden Hoop" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-brand-500 text-white font-bold rounded-xl hover:bg-brand-600 transition mt-2">
+                        Create Project Card
+                    </button>
+                </form>
+            `);
+        }
+
+        function handleAddProjectSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('p-title').value;
+            const status = document.getElementById('p-status').value;
+            const targetDate = document.getElementById('p-date').value;
+            const fabric = document.getElementById('p-fabric').value || 'Standard Fabric';
+            const hoop = document.getElementById('p-hoop').value || 'Standard Hoop';
+
+            appState.projects.unshift({
+                id: `proj-${Date.now()}`,
+                title,
+                status,
+                progress: 0,
+                targetDate,
+                fabric,
+                hoop,
+                threads: ['DMC 310'],
+                completedThreads: [],
+                notes: ''
+            });
+
+            saveState();
+            closeModal();
+            renderView();
+            showToast('Project created successfully!');
+        }
+
+        function openProjectDetailModal(id) {
+            const p = appState.projects.find(x => x.id === id);
+            if (!p) return;
+
+            openModal(p.title, `
+                <div class="space-y-4 text-xs">
+                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
+                        <div>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">Fabric & Hoop</p>
+                            <p class="font-bold text-gray-900 dark:text-white">${p.fabric} • ${p.hoop}</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400">${p.status}</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between font-bold mb-1">
+                            <span>Update Progress</span>
+                            <span class="text-brand-500">${p.progress}%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="${p.progress}" onchange="updateProjectProgress('${p.id}', this.value)" class="w-full accent-brand-500 cursor-pointer">
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-gray-900 dark:text-white mb-2">Required DMC/Cosmo Threads</h4>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${(p.threads || []).map(t => `<span class="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg font-bold">${t}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="deleteProject('${p.id}')" class="w-full py-2.5 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold rounded-xl hover:bg-red-100 transition">
+                            Delete Project
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function updateProjectProgress(id, val) {
+            const p = appState.projects.find(x => x.id === id);
+            if (p) {
+                p.progress = parseInt(val);
+                if (p.progress === 100) p.status = 'Completed';
+                saveState();
+                renderView();
+            }
+        }
+
+        function deleteProject(id) {
+            appState.projects = appState.projects.filter(p => p.id !== id);
+            saveState();
+            closeModal();
+            renderView();
+            showToast('Project removed');
+        }
+
+        function openAddSupplyModal(type) {
+            if (type === 'fabric') {
+                openModal('Add Fabric Cut', `
+                    <form onsubmit="handleAddFabricSubmit(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold mb-1">Fabric Type & Count</label>
+                            <input type="text" id="fab-count" required placeholder="e.g. 14ct Aida, 28ct Linen" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">Colorway</label>
+                            <input type="text" id="fab-color" required placeholder="e.g. Oatmeal / Natural" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">Dimensions</label>
+                            <input type="text" id="fab-dim" required placeholder="e.g. 15 x 18 inches" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-sage-500 text-white font-bold rounded-xl">Add Fabric</button>
+                    </form>
+                `);
+            } else {
+                openModal('Add Tool / Accessory', `
+                    <form onsubmit="handleAddToolSubmit(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold mb-1">Category</label>
+                            <input type="text" id="tool-type" required placeholder="e.g. Hoop, Needle, Scissors" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block font-bold mb-1">Name Description</label>
+                            <input type="text" id="tool-name" required placeholder="e.g. 6 inch Q-Snap Frame" class="w-full p-2.5 bg-gray-100 dark:bg-gray-800 rounded-xl">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gray-900 text-white font-bold rounded-xl">Add Tool</button>
+                    </form>
+                `);
+            }
+        }
+
+        function handleAddFabricSubmit(e) {
+            e.preventDefault();
+            appState.fabrics.unshift({
+                id: `fab-${Date.now()}`,
+                count: document.getElementById('fab-count').value,
+                color: document.getElementById('fab-color').value,
+                dimensions: document.getElementById('fab-dim').value,
+                qty: 1
+            });
+            saveState();
+            closeModal();
+            renderView();
+            showToast('Fabric added to stash!');
+        }
+
+        function handleAddToolSubmit(e) {
+            e.preventDefault();
+            appState.tools.unshift({
+                id: `tool-${Date.now()}`,
+                type: document.getElementById('tool-type').value,
+                name: document.getElementById('tool-name').value,
+                qty: 1
+            });
+            saveState();
+            closeModal();
+            renderView();
+            showToast('Tool added!');
+        }
+
+        function openCloudModal() {
+            const vaultId = currentVaultCode;
+            openModal('Cloud Sync & Data Backup', `
+                <div class="space-y-5 text-xs">
+                    <!-- Real-Time Cloud Sync Section -->
+                    <div class="bg-brand-50/50 dark:bg-brand-900/10 p-4 rounded-2xl border border-brand-200 dark:border-brand-800/30 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="cloud" class="w-5 h-5 text-brand-500"></i>
+                                <h4 class="font-bold text-sm text-gray-900 dark:text-white">Real-Time Cloud Vault</h4>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${vaultId ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}">
+                                ${vaultId ? 'Connected' : 'Offline / Standalone'}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Connect phones, tablets, or computers using a shared Vault Code to automatically synchronize floss inventory and projects.
+                        </p>
+
+                        ${vaultId ? `
+                            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-xl border border-emerald-500/30 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">Active Sync Vault Code</p>
+                                        <p class="text-lg font-extrabold font-mono text-gray-900 dark:text-white tracking-wider">${vaultId}</p>
+                                    </div>
+                                    <button onclick="copyVaultCode('${vaultId}')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Code
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                    <button onclick="pushStateToVault(); showToast('Synced to Cloud Vault!');" class="flex-1 py-1.5 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-lg transition text-center">
+                                        Sync Now
+                                    </button>
+                                    <button onclick="disconnectCloudVault()" class="py-1.5 px-3 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+                                        Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="space-y-3 pt-1">
+                                <button onclick="createNewVault()" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-brand-500/20">
+                                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Create New Sync Vault
+                                </button>
+
+                                <div class="flex items-center gap-2 pt-1">
+                                    <input type="text" id="join-vault-input" placeholder="Enter Vault Code (e.g. STITCH-4821)" class="flex-1 p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 font-mono text-xs text-gray-900 dark:text-white uppercase outline-none focus:border-brand-500">
+                                    <button onclick="joinVaultByCode(document.getElementById('join-vault-input').value)" class="py-2.5 px-4 bg-gray-900 dark:bg-gray-700 hover:bg-black text-white font-bold rounded-xl transition shrink-0">
+                                        Join
+                                    </button>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- File & Drive Backup Section -->
+                    <div class="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-3">
+                        <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                            <i data-lucide="folder-down" class="w-4 h-4 text-brand-500"></i> Google Drive & Device Backup
+                        </h4>
+                        <p class="text-gray-500 dark:text-gray-400">Save a backup file directly to Google Drive, iCloud, or local storage, or restore from a JSON backup file.</p>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="exportDataJSON()" class="py-2.5 bg-gray-100 dark:bg-gray-800 font-bold text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Download JSON
+                            </button>
+                            <label class="py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl text-center cursor-pointer hover:opacity-90 transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import JSON
+                                <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                            </label>
+                        </div>
+                        <button onclick="copyDataToClipboard()" class="w-full py-2 bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-400 font-semibold rounded-xl hover:bg-gray-100 transition flex items-center justify-center gap-1.5 text-[11px]">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Data to Clipboard
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function copyVaultCode(code) {
+            const dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.value = code;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast("Vault code copied!");
+        }
+
+        function copyDataToClipboard() {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = JSON.stringify(appState, null, 2);
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast("Backup JSON copied to clipboard!");
+        }
+
+        async function enableVault() {
+            if (window.saveToCloudVault) {
+                const code = await window.saveToCloudVault();
+                if (code) {
+                    showToast(`Cloud Vault active: ${code}`);
+                    openCloudModal();
+                }
+            }
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `stitchcraft_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('JSON Backup downloaded!');
+        }
+
+        function importDataJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    appState = { ...appState, ...parsed };
+                    saveState();
+                    closeModal();
+                    renderView();
+                    showToast('Data restored successfully!');
+                } catch(err) {
+                    showToast('Invalid JSON file format', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function setBrandFilter(b) {
+            appState.brandFilter = b;
+            renderThreads();
+        }
+
+        function setStashFilter(s) {
+            appState.stashFilter = s;
+            renderThreads();
+        }
+
+        function setProjectStatusFilter(s) {
+            appState.projectStatusFilter = s;
+            renderProjects();
+        }
+
+        function handleSearch(query) {
+            appState.searchQuery = query.trim();
+            renderView();
+        }
+
+        function toggleDarkMode() {
+            appState.darkMode = !appState.darkMode;
+            if (appState.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            saveState();
+        }
+
+        window.onload = function() {
+            initApp();
+            initFirebaseSync();
+        };
+    </script>
+</body>
+</html>
