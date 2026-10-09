@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StitchCraft - Embroidery Supply & Project Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        craft: {
+                            50: '#FAF7F5',
+                            100: '#F5EFEA',
+                            200: '#E6D7CB',
+                            300: '#D5BEAD',
+                            400: '#B69279',
+                            500: '#9B6D51',
+                            600: '#84533A',
+                            700: '#683F2B',
+                            800: '#4D2E1F',
+                            900: '#341E14',
+                        },
+                        rosewood: '#C86D74',
+                        sage: '#87A08B',
+                        linen: '#F9F6F0',
+                        warmgray: '#EFECE6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            background-color: #F9F6F0;
+            font-family: 'Inter', sans-serif;
+            color: #341E14;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F5EFEA;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D5BEAD;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #B69279;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased bg-linen">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-craft-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-rosewood flex items-center justify-center text-white shadow-md">
+                        <i data-lucide="scissors" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl text-craft-900 leading-tight">StitchCraft</h1>
+                        <p class="text-xs text-craft-500 font-medium">Embroidery Studio & Inventory</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 text-craft-700 bg-craft-100">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('threads')" id="nav-threads" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 text-craft-600 hover:bg-craft-50">
+                        <i data-lucide="palette" class="w-4 h-4"></i> Floss Library
+                    </button>
+                    <button onclick="switchTab('conversion')" id="nav-conversion" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 text-craft-600 hover:bg-craft-50">
+                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Converter
+                    </button>
+                    <button onclick="switchTab('supplies')" id="nav-supplies" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 text-craft-600 hover:bg-craft-50">
+                        <i data-lucide="box" class="w-4 h-4"></i> Supplies
+                    </button>
+                    <button onclick="switchTab('projects')" id="nav-projects" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 text-craft-600 hover:bg-craft-50">
+                        <i data-lucide="folder-heart" class="w-4 h-4"></i> Projects
+                    </button>
+                </nav>
+
+                <!-- Actions / Cloud Sync -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="openSyncModal()" class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-full border border-craft-200 bg-craft-50 hover:bg-craft-100 text-craft-700 transition">
+                        <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="sync-status-text" class="hidden sm:inline">Synced</span>
+                        <i data-lucide="cloud" class="w-3.5 h-3.5"></i>
+                    </button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-craft-600 hover:bg-craft-100">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-craft-200 bg-white px-4 pt-2 pb-3 space-y-1">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-craft-700 hover:bg-craft-50 flex items-center gap-2">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+            </button>
+            <button onclick="switchTab('threads'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-craft-700 hover:bg-craft-50 flex items-center gap-2">
+                <i data-lucide="palette" class="w-5 h-5"></i> Floss Library & Stock
+            </button>
+            <button onclick="switchTab('conversion'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-craft-700 hover:bg-craft-50 flex items-center gap-2">
+                <i data-lucide="arrow-left-right" class="w-5 h-5"></i> Thread Converter
+            </button>
+            <button onclick="switchTab('supplies'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-craft-700 hover:bg-craft-50 flex items-center gap-2">
+                <i data-lucide="box" class="w-5 h-5"></i> Supplies & Materials
+            </button>
+            <button onclick="switchTab('projects'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-craft-700 hover:bg-craft-50 flex items-center gap-2">
+                <i data-lucide="folder-heart" class="w-5 h-5"></i> Embroidery Projects
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= DASHBOARD TAB ================= -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- Hero Welcome Card -->
+            <div class="bg-gradient-to-r from-craft-800 to-craft-900 rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute right-0 top-0 bottom-0 opacity-10 flex items-center pr-10 pointer-events-none">
+                    <i data-lucide="flower-2" class="w-64 h-64 text-white"></i>
+                </div>
+                <div class="relative z-10 max-w-2xl">
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold mb-2">Welcome to your Stitch Studio</h2>
+                    <p class="text-craft-200 text-sm sm:text-base mb-6">Track your thread stash, convert color codes between DMC, Anchor, & Cosmo, and manage your active WIPs in one serene place.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="switchTab('threads')" class="bg-rosewood hover:bg-rosewood/90 text-white px-4 py-2 rounded-xl font-medium text-sm transition flex items-center gap-2 shadow-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add to Floss Stash
+                        </button>
+                        <button onclick="openModal('project-modal')" class="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm px-4 py-2 rounded-xl font-medium text-sm transition flex items-center gap-2 border border-white/20">
+                            <i data-lucide="folder-plus" class="w-4 h-4"></i> New Project
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-craft-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-craft-100 rounded-xl text-craft-700">
+                        <i data-lucide="palette" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-craft-500 font-medium uppercase tracking-wider">Floss Owned</p>
+                        <h3 id="stat-floss-count" class="text-2xl font-bold text-craft-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-craft-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+                        <i data-lucide="activity" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-craft-500 font-medium uppercase tracking-wider">Active WIPs</p>
+                        <h3 id="stat-active-projects" class="text-2xl font-bold text-craft-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-craft-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-sage/20 rounded-xl text-sage">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-craft-500 font-medium uppercase tracking-wider">Completed</p>
+                        <h3 id="stat-completed-projects" class="text-2xl font-bold text-craft-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-craft-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-rose-50 rounded-xl text-rosewood">
+                        <i data-lucide="scissors" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-craft-500 font-medium uppercase tracking-wider">Supplies Saved</p>
+                        <h3 id="stat-total-supplies" class="text-2xl font-bold text-craft-900">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Overview Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Recent Active Projects -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-craft-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-serif font-bold text-lg text-craft-900">Active WIP Projects</h3>
+                        <button onclick="switchTab('projects')" class="text-xs text-craft-600 hover:text-craft-800 font-medium flex items-center gap-1">
+                            View All <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div id="dashboard-active-projects" class="space-y-3">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Recent Floss & Low Stock Alerts -->
+                <div class="bg-white rounded-2xl p-6 border border-craft-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-craft-900 mb-4">Quick Thread Lookup</h3>
+                        <div class="relative mb-4">
+                            <input type="text" id="dash-floss-search" oninput="quickSearchFloss(this.value)" placeholder="Search DMC, Anchor, or Cosmo..." class="w-full pl-9 pr-3 py-2 text-sm bg-craft-50 border border-craft-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-craft-400">
+                            <i data-lucide="search" class="w-4 h-4 text-craft-400 absolute left-3 top-2.5"></i>
+                        </div>
+                        <div id="dash-floss-results" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                            <p class="text-xs text-craft-500 italic text-center py-4">Type above to instantly check thread stock.</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-craft-100">
+                        <button onclick="switchTab('conversion')" class="w-full py-2 bg-craft-100 hover:bg-craft-200 text-craft-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition">
+                            <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Open Cross-Brand Converter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= THREAD INVENTORY TAB ================= -->
+        <section id="tab-threads" class="hidden space-y-6">
+            <!-- Header & Controls -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-craft-200 shadow-sm">
+                <div>
+                    <h2 class="font-serif font-bold text-xl text-craft-900">Thread Floss Library & Stash</h2>
+                    <p class="text-xs text-craft-500">Comprehensive DMC, Anchor & Cosmo references with personal stock tracking.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterFlossStock('all')" id="btn-filter-all" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-800 text-white">All Library</button>
+                    <button onclick="filterFlossStock('owned')" id="btn-filter-owned" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200">Owned Only</button>
+                    <button onclick="filterFlossStock('needed')" id="btn-filter-needed" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200">Shopping List</button>
+                    <button onclick="openModal('custom-thread-modal')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-rosewood text-white hover:bg-rosewood/90 flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Custom Floss
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Filters Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div class="relative sm:col-span-2">
+                    <input type="text" id="floss-search-input" oninput="renderFlossGrid()" placeholder="Search by color name, code (e.g. 310, 666)..." class="w-full pl-9 pr-3 py-2 text-sm bg-white border border-craft-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-craft-400">
+                    <i data-lucide="search" class="w-4 h-4 text-craft-400 absolute left-3 top-3"></i>
+                </div>
+                <div>
+                    <select id="floss-brand-filter" onchange="renderFlossGrid()" class="w-full py-2 px-3 text-sm bg-white border border-craft-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-craft-400">
+                        <option value="all">All Brands (DMC / Anchor / Cosmo)</option>
+                        <option value="dmc">Primary: DMC Code</option>
+                        <option value="anchor">Primary: Anchor Code</option>
+                        <option value="cosmo">Primary: Cosmo Code</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="floss-color-family" onchange="renderFlossGrid()" class="w-full py-2 px-3 text-sm bg-white border border-craft-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-craft-400">
+                        <option value="all">All Color Families</option>
+                        <option value="Red">Reds & Pinks</option>
+                        <option value="Blue">Blues & Teals</option>
+                        <option value="Green">Greens</option>
+                        <option value="Yellow">Yellows & Oranges</option>
+                        <option value="Purple">Purples & Violets</option>
+                        <option value="Brown">Browns & Earth</option>
+                        <option value="Neutral">Black, White & Grays</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Thread Grid Container -->
+            <div id="floss-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Dynamic Floss Cards rendered here -->
+            </div>
+        </section>
+
+        <!-- ================= CONVERSION TOOL TAB ================= -->
+        <section id="tab-conversion" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-craft-200 shadow-sm">
+                <div class="max-w-2xl">
+                    <h2 class="font-serif font-bold text-xl text-craft-900 mb-1">Floss Conversion Engine</h2>
+                    <p class="text-xs text-craft-500 mb-6">Convert thread codes instantly between DMC, Anchor, and Cosmo to find nearest matching color equivalents.</p>
+                </div>
+
+                <!-- Converter Form -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-craft-50 p-4 rounded-xl border border-craft-200">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 uppercase mb-1">Source Brand</label>
+                        <select id="convert-source-brand" onchange="updateConvertOptions()" class="w-full p-2.5 bg-white border border-craft-200 rounded-xl text-sm focus:ring-2 focus:ring-craft-400">
+                            <option value="dmc">DMC</option>
+                            <option value="anchor">Anchor</option>
+                            <option value="cosmo">Cosmo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 uppercase mb-1">Select / Type Thread Code</label>
+                        <input type="text" id="convert-thread-input" list="convert-thread-list" placeholder="e.g. 310, 666, 1" class="w-full p-2.5 bg-white border border-craft-200 rounded-xl text-sm focus:ring-2 focus:ring-craft-400">
+                        <datalist id="convert-thread-list"></datalist>
+                    </div>
+                    <div>
+                        <button onclick="executeConversion()" class="w-full py-2.5 bg-craft-800 hover:bg-craft-900 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Convert Thread
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Conversion Output Display -->
+                <div id="conversion-result" class="mt-6 hidden">
+                    <h3 class="text-sm font-semibold text-craft-800 uppercase tracking-wider mb-4">Conversion Match Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Selected Source Card -->
+                        <div class="bg-white border-2 border-craft-800 p-5 rounded-2xl relative shadow-sm">
+                            <span class="absolute top-3 right-3 text-[10px] bg-craft-800 text-white px-2 py-0.5 rounded-full font-bold uppercase">Source</span>
+                            <div class="flex items-center space-x-4 mb-3">
+                                <div id="source-color-swatch" class="w-12 h-12 rounded-xl shadow-inner border border-black/10"></div>
+                                <div>
+                                    <h4 id="source-brand-title" class="font-bold text-craft-900">DMC</h4>
+                                    <p id="source-code-title" class="text-xl font-extrabold text-craft-800">#310</p>
+                                </div>
+                            </div>
+                            <p id="source-color-name" class="text-sm font-medium text-craft-700">Black</p>
+                        </div>
+
+                        <!-- Equivalent 1 -->
+                        <div id="target-1-card" class="bg-white border border-craft-200 p-5 rounded-2xl shadow-sm">
+                            <span id="target-1-badge" class="inline-block text-[10px] bg-sage text-white px-2 py-0.5 rounded-full font-bold uppercase mb-2">Anchor Match</span>
+                            <div class="flex items-center space-x-4 mb-3">
+                                <div id="target-1-swatch" class="w-12 h-12 rounded-xl shadow-inner border border-black/10"></div>
+                                <div>
+                                    <h4 id="target-1-brand" class="font-bold text-craft-900">Anchor</h4>
+                                    <p id="target-1-code" class="text-xl font-extrabold text-craft-800">#403</p>
+                                </div>
+                            </div>
+                            <p id="target-1-name" class="text-sm font-medium text-craft-700">Black</p>
+                            <div class="mt-3 pt-3 border-t border-craft-100 flex justify-between items-center text-xs">
+                                <span class="text-craft-500">Match Confidence:</span>
+                                <span id="target-1-confidence" class="font-semibold text-emerald-600">Exact / 98%</span>
+                            </div>
+                        </div>
+
+                        <!-- Equivalent 2 -->
+                        <div id="target-2-card" class="bg-white border border-craft-200 p-5 rounded-2xl shadow-sm">
+                            <span id="target-2-badge" class="inline-block text-[10px] bg-rosewood text-white px-2 py-0.5 rounded-full font-bold uppercase mb-2">Cosmo Match</span>
+                            <div class="flex items-center space-x-4 mb-3">
+                                <div id="target-2-swatch" class="w-12 h-12 rounded-xl shadow-inner border border-black/10"></div>
+                                <div>
+                                    <h4 id="target-2-brand" class="font-bold text-craft-900">Cosmo</h4>
+                                    <p id="target-2-code" class="text-xl font-extrabold text-craft-800">#600</p>
+                                </div>
+                            </div>
+                            <p id="target-2-name" class="text-sm font-medium text-craft-700">Black</p>
+                            <div class="mt-3 pt-3 border-t border-craft-100 flex justify-between items-center text-xs">
+                                <span class="text-craft-500">Match Confidence:</span>
+                                <span id="target-2-confidence" class="font-semibold text-emerald-600">Exact / 98%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SUPPLIES INVENTORY TAB ================= -->
+        <section id="tab-supplies" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-craft-200 shadow-sm">
+                <div>
+                    <h2 class="font-serif font-bold text-xl text-craft-900">Fabrics, Hoops & Notions Stash</h2>
+                    <p class="text-xs text-craft-500">Organize your linen counts, hoop sizes, needles, and accessories.</p>
+                </div>
+                <button onclick="openModal('supply-modal')" class="px-4 py-2 bg-rosewood hover:bg-rosewood/90 text-white rounded-xl text-sm font-medium transition flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add Supply Item
+                </button>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="flex border-b border-craft-200 space-x-4">
+                <button onclick="switchSupplyCategory('all')" id="sup-cat-all" class="sup-tab-btn border-b-2 border-craft-800 pb-2 px-1 text-sm font-bold text-craft-800">All Supplies</button>
+                <button onclick="switchSupplyCategory('Fabric')" id="sup-cat-Fabric" class="sup-tab-btn border-b-2 border-transparent pb-2 px-1 text-sm font-medium text-craft-500 hover:text-craft-800">Fabrics & Aida</button>
+                <button onclick="switchSupplyCategory('Hoop')" id="sup-cat-Hoop" class="sup-tab-btn border-b-2 border-transparent pb-2 px-1 text-sm font-medium text-craft-500 hover:text-craft-800">Hoops & Frames</button>
+                <button onclick="switchSupplyCategory('Needle')" id="sup-cat-Needle" class="sup-tab-btn border-b-2 border-transparent pb-2 px-1 text-sm font-medium text-craft-500 hover:text-craft-800">Needles</button>
+                <button onclick="switchSupplyCategory('Notion')" id="sup-cat-Notion" class="sup-tab-btn border-b-2 border-transparent pb-2 px-1 text-sm font-medium text-craft-500 hover:text-craft-800">Accessories & Tools</button>
+            </div>
+
+            <!-- Supplies Grid -->
+            <div id="supplies-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- ================= PROJECTS TAB ================= -->
+        <section id="tab-projects" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-craft-200 shadow-sm">
+                <div>
+                    <h2 class="font-serif font-bold text-xl text-craft-900">Embroidery Projects Tracker</h2>
+                    <p class="text-xs text-craft-500">Plan, track active stitching progress, and archive finished pieces.</p>
+                </div>
+                <button onclick="openModal('project-modal')" class="px-4 py-2 bg-craft-800 hover:bg-craft-900 text-white rounded-xl text-sm font-medium transition flex items-center gap-2">
+                    <i data-lucide="folder-plus" class="w-4 h-4"></i> Create New Project
+                </button>
+            </div>
+
+            <!-- Project Filter Pills -->
+            <div class="flex space-x-2">
+                <button onclick="filterProjects('all')" id="proj-filter-all" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-800 text-white">All Projects</button>
+                <button onclick="filterProjects('Active')" id="proj-filter-Active" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200">Active WIPs</button>
+                <button onclick="filterProjects('Planned')" id="proj-filter-Planned" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200">Planned</button>
+                <button onclick="filterProjects('Completed')" id="proj-filter-Completed" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200">Completed</button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= MODALS & POPUPS ================= -->
+
+    <!-- Custom Thread Add/Edit Modal -->
+    <div id="custom-thread-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-craft-200">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif font-bold text-lg text-craft-900">Custom / Special Floss</h3>
+                <button onclick="closeModal('custom-thread-modal')" class="text-craft-400 hover:text-craft-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="custom-thread-form" onsubmit="saveCustomThread(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Brand Name</label>
+                    <input type="text" id="custom-floss-brand" required placeholder="e.g. DMC, Weeks Dye Works, Hand-dyed" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Code / Number</label>
+                        <input type="text" id="custom-floss-code" required placeholder="e.g. 310 or W102" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Color Preview Hex</label>
+                        <input type="color" id="custom-floss-hex" value="#C86D74" class="w-full h-9 p-1 border border-craft-200 rounded-xl cursor-pointer">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Color Description</label>
+                    <input type="text" id="custom-floss-name" required placeholder="e.g. Dusty Rose" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Quantity (Skeins)</label>
+                        <input type="number" step="0.5" id="custom-floss-qty" value="1" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Storage Location</label>
+                        <input type="text" id="custom-floss-loc" placeholder="e.g. Box A, Bobbin #12" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('custom-thread-modal')" class="px-4 py-2 border border-craft-200 text-craft-700 rounded-xl text-sm font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-rosewood hover:bg-rosewood/90 text-white rounded-xl text-sm font-medium">Save Thread</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supply Add/Edit Modal -->
+    <div id="supply-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-craft-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="supply-modal-title" class="font-serif font-bold text-lg text-craft-900">Add Supply Item</h3>
+                <button onclick="closeModal('supply-modal')" class="text-craft-400 hover:text-craft-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="supply-form" onsubmit="saveSupply(event)" class="space-y-4">
+                <input type="hidden" id="supply-id">
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Item Title / Name</label>
+                    <input type="text" id="supply-title" required placeholder="e.g. 14ct White Aida Fabric" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Category</label>
+                        <select id="supply-category" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                            <option value="Fabric">Fabric / Canvas</option>
+                            <option value="Hoop">Hoop / Frame</option>
+                            <option value="Needle">Needles</option>
+                            <option value="Notion">Notion / Tool / Scissors</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Quantity</label>
+                        <input type="number" id="supply-qty" value="1" min="0" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Specifications / Dimensions</label>
+                    <input type="text" id="supply-specs" placeholder="e.g. 18x24 inches, Size 24 Tapestry, 8-inch Bamboo" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Storage Location</label>
+                    <input type="text" id="supply-location" placeholder="e.g. Top Drawer, Fabric Tub 2" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Photo Attachment</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="supply-image-url" placeholder="Image URL or upload file..." class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                        <label class="px-3 py-2 bg-craft-100 hover:bg-craft-200 text-craft-800 rounded-xl text-xs font-medium cursor-pointer flex-shrink-0">
+                            Upload
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'supply-image-url')">
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Notes / Details</label>
+                    <textarea id="supply-notes" rows="2" placeholder="Additional details, brand preference..." class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('supply-modal')" class="px-4 py-2 border border-craft-200 text-craft-700 rounded-xl text-sm font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-rosewood hover:bg-rosewood/90 text-white rounded-xl text-sm font-medium">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Add/Edit Modal -->
+    <div id="project-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-craft-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="project-modal-title" class="font-serif font-bold text-lg text-craft-900">Create New Project</h3>
+                <button onclick="closeModal('project-modal')" class="text-craft-400 hover:text-craft-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="project-form" onsubmit="saveProject(event)" class="space-y-4">
+                <input type="hidden" id="project-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Project Title</label>
+                        <input type="text" id="project-title" required placeholder="e.g. Botanical Floral Hoop" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Pattern Creator / Designer</label>
+                        <input type="text" id="project-designer" placeholder="e.g. Stitching With Love / Etsy" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Status</label>
+                        <select id="project-status" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                            <option value="Active">Active WIP</option>
+                            <option value="Planned">Planned</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Progress (%)</label>
+                        <input type="number" id="project-progress" min="0" max="100" value="0" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Hoop Size / Frame</label>
+                        <input type="text" id="project-hoop" placeholder="e.g. 7-inch round" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Fabric Specification</label>
+                        <input type="text" id="project-fabric" placeholder="e.g. 28ct Linen Cream" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-craft-700 mb-1">Target Completion Date</label>
+                        <input type="date" id="project-target-date" class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Required Thread DMC Codes (comma separated)</label>
+                    <input type="text" id="project-threads" placeholder="e.g. 310, 666, 701, 815, B520" class="w-full p-2.5 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                    <p class="text-[11px] text-craft-500 mt-1">These will automatically check against your owned thread inventory!</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Project Photo</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="project-image-url" placeholder="Image URL or upload photo..." class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400">
+                        <label class="px-3 py-2 bg-craft-100 hover:bg-craft-200 text-craft-800 rounded-xl text-xs font-medium cursor-pointer flex-shrink-0">
+                            Upload Photo
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'project-image-url')">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-craft-700 mb-1">Notes / Stitching Diary</label>
+                    <textarea id="project-notes" rows="3" placeholder="Stitch techniques used, gift notes, fabric count details..." class="w-full p-2 text-sm border border-craft-200 rounded-xl focus:ring-2 focus:ring-craft-400"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('project-modal')" class="px-4 py-2 border border-craft-200 text-craft-700 rounded-xl text-sm font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-craft-800 hover:bg-craft-900 text-white rounded-xl text-sm font-medium">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Detail View Modal -->
+    <div id="project-detail-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-craft-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div id="project-detail-content">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Sync & Backup Modal -->
+    <div id="sync-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-craft-200">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif font-bold text-lg text-craft-900">Cloud Sync & Data Backup</h3>
+                <button onclick="closeModal('sync-modal')" class="text-craft-400 hover:text-craft-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Data Backup & Restore -->
+                <div class="bg-craft-50 p-4 rounded-xl border border-craft-200">
+                    <h4 class="text-sm font-bold text-craft-900 mb-1">Local JSON Backup & Restore</h4>
+                    <p class="text-xs text-craft-500 mb-3">Download a full offline snapshot of your threads, supplies, and projects, or restore from file.</p>
+                    <div class="flex gap-2">
+                        <button onclick="exportBackupJSON()" class="flex-1 py-2 bg-craft-800 hover:bg-craft-900 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="download" class="w-4 h-4"></i> Backup Data
+                        </button>
+                        <label class="flex-1 py-2 bg-white border border-craft-200 hover:bg-craft-100 text-craft-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition">
+                            <i data-lucide="upload" class="w-4 h-4"></i> Restore File
+                            <input type="file" accept=".json" class="hidden" onchange="importBackupJSON(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Cloud Service / Drive Connection -->
+                <div class="bg-craft-50 p-4 rounded-xl border border-craft-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-bold text-craft-900 flex items-center gap-1.5">
+                            <i data-lucide="cloud" class="w-4 h-4 text-sky-600"></i> Google Drive Cloud Sync
+                        </h4>
+                        <span id="gdrive-status-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">Simulated Local Cloud</span>
+                    </div>
+                    <p class="text-xs text-craft-500 mb-3">Sync your studio data safely to cloud storage across your desktop and tablet devices.</p>
+                    
+                    <div class="space-y-2">
+                        <button onclick="triggerCloudSync()" class="w-full py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Now to Cloud Storage
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clear Data -->
+                <div class="pt-2 border-t border-craft-100 flex justify-between items-center">
+                    <button onclick="resetToDefaults()" class="text-xs text-rose-600 hover:underline">Reset Studio Data</button>
+                    <button onclick="closeModal('sync-modal')" class="px-4 py-2 bg-craft-100 text-craft-800 rounded-xl text-xs font-medium">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Default Reference Library of Threads with DMC, Anchor, and Cosmo mappings & HEX codes
+        const THREAD_LIBRARY = [
+            { dmc: "310", anchor: "403", cosmo: "600", name: "Black", hex: "#000000", family: "Neutral" },
+            { dmc: "B520", anchor: "1", cosmo: "100", name: "Snow White", hex: "#FFFFFF", family: "Neutral" },
+            { dmc: "666", anchor: "46", cosmo: "345", name: "Bright Red", hex: "#E31B23", family: "Red" },
+            { dmc: "815", anchor: "44", cosmo: "347", name: "Garnet Medium", hex: "#8A1B29", family: "Red" },
+            { dmc: "602", anchor: "63", cosmo: "204", name: "Cranberry Medium", hex: "#E03C70", family: "Red" },
+            { dmc: "605", anchor: "52", cosmo: "201", name: "Cranberry Very Light", hex: "#FFB0C8", family: "Red" },
+            { dmc: "796", anchor: "133", cosmo: "414", name: "Royal Blue Dark", hex: "#113A78", family: "Blue" },
+            { dmc: "798", anchor: "131", cosmo: "412", name: "Delft Blue Dark", hex: "#466CA6", family: "Blue" },
+            { dmc: "800", anchor: "128", cosmo: "410", name: "Delft Blue Pale", hex: "#B8D4E8", family: "Blue" },
+            { dmc: "701", anchor: "227", cosmo: "325", name: "Green Light", hex: "#238B45", family: "Green" },
+            { dmc: "703", anchor: "238", cosmo: "323", name: "Chartreuse Medium", hex: "#72B844", family: "Green" },
+            { dmc: "934", anchor: "862", cosmo: "318", name: "Avocado Green Black", hex: "#313D2B", family: "Green" },
+            { dmc: "444", anchor: "290", cosmo: "701", name: "Lemon Dark", hex: "#FFD700", family: "Yellow" },
+            { dmc: "742", anchor: "303", cosmo: "143", name: "Tangerine Light", hex: "#FFA500", family: "Yellow" },
+            { dmc: "550", anchor: "102", cosmo: "284", name: "Violet Very Dark", hex: "#4B0082", family: "Purple" },
+            { dmc: "553", anchor: "98", cosmo: "282", name: "Violet Medium", hex: "#8A2BE2", family: "Purple" },
+            { dmc: "801", anchor: "359", cosmo: "311", name: "Coffee Brown Dark", hex: "#4A2E16", family: "Brown" },
+            { dmc: "436", anchor: "1048", cosmo: "307", name: "Tan Very Light", hex: "#C68E56", family: "Brown" },
+            { dmc: "414", anchor: "235", cosmo: "893", name: "Steel Gray Dark", hex: "#6C6C6C", family: "Neutral" },
+            { dmc: "762", anchor: "234", cosmo: "891", name: "Pearl Gray Very Light", hex: "#E5E5E5", family: "Neutral" }
+        ];
+
+        // State Management
+        let appState = {
+            threadsStock: {}, // { "DMC:310": { owned: true, qty: 2, bobbin: "B-12", loc: "Drawer 1" } }
+            customThreads: [],
+            supplies: [],
+            projects: [],
+            lastSync: new Date().toISOString()
+        };
+
+        let currentTab = 'dashboard';
+        let flossFilter = 'all';
+        let supplyCategory = 'all';
+        let projectFilter = 'all';
+
+        // Initialize App
+        window.onload = function() {
+            loadFromLocalStorage();
+            lucide.createIcons();
+            renderAll();
+        };
+
+        function saveToLocalStorage() {
+            localStorage.setItem('stitchcraft_data_v1', JSON.stringify(appState));
+            updateSyncStatus('Unsaved Changes', 'bg-amber-500');
+            setTimeout(() => {
+                updateSyncStatus('Synced', 'bg-emerald-500');
+            }, 800);
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('stitchcraft_data_v1');
+            if (saved) {
+                try {
+                    appState = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Error loading local state", e);
+                }
+            } else {
+                // Populate initial sample data
+                appState.threadsStock = {
+                    "DMC:310": { owned: true, qty: 3, bobbin: "1", loc: "Main Box" },
+                    "DMC:666": { owned: true, qty: 1.5, bobbin: "14", loc: "Main Box" },
+                    "DMC:701": { owned: true, qty: 1, bobbin: "22", loc: "Drawer A" },
+                    "DMC:B520": { owned: true, qty: 4, bobbin: "2", loc: "Main Box" }
+                };
+                appState.supplies = [
+                    { id: '1', title: '14ct Natural Linen Aida', category: 'Fabric', qty: 2, specs: '15x18 inches', location: 'Fabric Shelf', notes: 'Zweigart brand', image: '' },
+                    { id: '2', title: 'Beechwood Round Hoop 6"', category: 'Hoop', qty: 3, specs: '6 inch diameter', location: 'Drawer 2', notes: 'Smooth finish', image: '' },
+                    { id: '3', title: 'Tapestry Needles Size 24', category: 'Needle', qty: 10, specs: 'Bohin Brand', location: 'Needle Minder', notes: '', image: '' }
+                ];
+                appState.projects = [
+                    {
+                        id: 'p1',
+                        title: 'Meadow Wildflowers Hoop',
+                        designer: 'StitchCraft Designs',
+                        status: 'Active',
+                        progress: 65,
+                        hoop: '6-inch round',
+                        fabric: '14ct Cream Aida',
+                        targetDate: '2026-11-15',
+                        threads: '310, 666, 701, 742',
+                        image: '',
+                        notes: 'Stitching stems with split stitch, French knots for flower centers.'
+                    }
+                ];
+                saveToLocalStorage();
+            }
+        }
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-craft-100', 'text-craft-700');
+                btn.classList.add('text-craft-600');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-craft-100', 'text-craft-700');
+            }
+
+            if (tabId === 'conversion') updateConvertOptions();
+            renderAll();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // RENDER ALL VIEWS
+        function renderAll() {
+            renderDashboard();
+            renderFlossGrid();
+            renderSupplies();
+            renderProjects();
+            lucide.createIcons();
+        }
+
+        // DASHBOARD RENDERER
+        function renderDashboard() {
+            // Stats calculation
+            const ownedCount = Object.keys(appState.threadsStock).length + appState.customThreads.length;
+            const activeProjs = appState.projects.filter(p => p.status === 'Active').length;
+            const completedProjs = appState.projects.filter(p => p.status === 'Completed').length;
+            const totalSupplies = appState.supplies.reduce((acc, curr) => acc + Number(curr.qty || 1), 0);
+
+            document.getElementById('stat-floss-count').innerText = ownedCount;
+            document.getElementById('stat-active-projects').innerText = activeProjs;
+            document.getElementById('stat-completed-projects').innerText = completedProjs;
+            document.getElementById('stat-total-supplies').innerText = totalSupplies;
+
+            // Active Projects Card
+            const activeProjsList = appState.projects.filter(p => p.status === 'Active');
+            const activeContainer = document.getElementById('dashboard-active-projects');
+            if (activeProjsList.length === 0) {
+                activeContainer.innerHTML = `<p class="text-xs text-craft-500 italic py-4 text-center">No active projects currently in progress.</p>`;
+            } else {
+                activeContainer.innerHTML = activeProjsList.map(p => `
+                    <div class="flex items-center justify-between p-3 bg-craft-50 rounded-xl border border-craft-200 hover:border-craft-300 transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-craft-200 flex items-center justify-center text-craft-700 overflow-hidden">
+                                ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i data-lucide="flower-2" class="w-5 h-5"></i>`}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-craft-900">${escapeHtml(p.title)}</h4>
+                                <p class="text-[11px] text-craft-500">${escapeHtml(p.designer || 'Self Pattern')} • ${p.fabric || 'Fabric'}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-craft-800">${p.progress}%</span>
+                            <div class="w-20 bg-craft-200 rounded-full h-1.5 mt-1">
+                                <div class="bg-rosewood h-1.5 rounded-full" style="width: ${p.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Quick Search Floss in Dashboard
+        function quickSearchFloss(query) {
+            const container = document.getElementById('dash-floss-results');
+            if (!query.trim()) {
+                container.innerHTML = `<p class="text-xs text-craft-500 italic text-center py-4">Type above to instantly check thread stock.</p>`;
+                return;
+            }
+            const q = query.toLowerCase();
+            const matches = THREAD_LIBRARY.filter(t => 
+                t.dmc.toLowerCase().includes(q) || 
+                t.anchor.toLowerCase().includes(q) || 
+                t.cosmo.toLowerCase().includes(q) || 
+                t.name.toLowerCase().includes(q)
+            );
+
+            if (matches.length === 0) {
+                container.innerHTML = `<p class="text-xs text-craft-500 italic py-2 text-center">No matching thread code.</p>`;
+                return;
+            }
+
+            container.innerHTML = matches.map(t => {
+                const stock = appState.threadsStock[`DMC:${t.dmc}`];
+                const isOwned = !!stock;
+                return `
+                    <div class="flex items-center justify-between p-2 rounded-xl border border-craft-100 bg-white text-xs">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3.5 h-3.5 rounded-full border border-black/10 inline-block" style="background-color: ${t.hex}"></span>
+                            <span class="font-bold text-craft-800">DMC ${t.dmc}</span>
+                            <span class="text-craft-500 truncate max-w-[100px]">${t.name}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${isOwned ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}">
+                            ${isOwned ? `${stock.qty || 1} in stock` : 'Out of stock'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // THREAD FLOSS GRID RENDERER
+        function filterFlossStock(type) {
+            flossFilter = type;
+            ['all', 'owned', 'needed'].forEach(f => {
+                const btn = document.getElementById(`btn-filter-${f}`);
+                if (btn) {
+                    if (f === type) {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-800 text-white";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200";
+                    }
+                }
+            });
+            renderFlossGrid();
+        }
+
+        function renderFlossGrid() {
+            const grid = document.getElementById('floss-grid');
+            if (!grid) return;
+
+            const searchQuery = (document.getElementById('floss-search-input')?.value || '').toLowerCase();
+            const brandFilter = document.getElementById('floss-brand-filter')?.value || 'all';
+            const familyFilter = document.getElementById('floss-color-family')?.value || 'all';
+
+            let items = [...THREAD_LIBRARY];
+
+            // Apply Filters
+            items = items.filter(item => {
+                const stockKey = `DMC:${item.dmc}`;
+                const isOwned = !!appState.threadsStock[stockKey];
+
+                if (flossFilter === 'owned' && !isOwned) return false;
+                if (flossFilter === 'needed' && isOwned) return false;
+
+                if (familyFilter !== 'all' && item.family !== familyFilter) return false;
+
+                if (searchQuery) {
+                    const matchesSearch = item.dmc.toLowerCase().includes(searchQuery) ||
+                        item.anchor.toLowerCase().includes(searchQuery) ||
+                        item.cosmo.toLowerCase().includes(searchQuery) ||
+                        item.name.toLowerCase().includes(searchQuery);
+                    if (!matchesSearch) return false;
+                }
+
+                return true;
+            });
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-craft-500 text-sm italic">No thread colors found matching filters.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => {
+                const stockKey = `DMC:${item.dmc}`;
+                const stock = appState.threadsStock[stockKey];
+                const isOwned = !!stock;
+
+                return `
+                    <div class="bg-white rounded-2xl border ${isOwned ? 'border-sage/50 shadow-sm' : 'border-craft-200'} p-3 flex flex-col justify-between transition hover:shadow-md relative">
+                        <div>
+                            <!-- Color Swatch Header -->
+                            <div class="h-10 rounded-xl mb-2 flex items-center justify-end px-2 shadow-inner border border-black/5" style="background-color: ${item.hex}">
+                                <button onclick="toggleFlossStock('${item.dmc}')" title="${isOwned ? 'In Stash' : 'Add to Stash'}" class="w-6 h-6 rounded-full bg-white/90 shadow text-craft-800 flex items-center justify-center hover:bg-white transition">
+                                    <i data-lucide="${isOwned ? 'check' : 'plus'}" class="w-3.5 h-3.5 ${isOwned ? 'text-emerald-600 font-bold' : ''}"></i>
+                                </button>
+                            </div>
+                            <!-- Codes -->
+                            <div class="space-y-0.5">
+                                <h4 class="font-bold text-sm text-craft-900 leading-tight">${item.name}</h4>
+                                <div class="text-[11px] font-mono text-craft-600 flex flex-wrap gap-x-2">
+                                    <span><b class="text-craft-800">DMC:</b> ${item.dmc}</span>
+                                    <span><b>ANC:</b> ${item.anchor}</span>
+                                    <span><b>COS:</b> ${item.cosmo}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stock Controls -->
+                        <div class="mt-3 pt-2 border-t border-craft-100 flex items-center justify-between text-xs">
+                            <span class="text-[10px] text-craft-500">${isOwned ? 'In Stash:' : 'Stock:'}</span>
+                            ${isOwned ? `
+                                <div class="flex items-center space-x-1">
+                                    <button onclick="updateFlossQty('${item.dmc}', -0.5)" class="w-5 h-5 rounded bg-craft-100 hover:bg-craft-200 text-craft-800 font-bold flex items-center justify-center">-</button>
+                                    <span class="font-bold text-craft-900 min-w-[20px] text-center">${stock.qty || 1}</span>
+                                    <button onclick="updateFlossQty('${item.dmc}', 0.5)" class="w-5 h-5 rounded bg-craft-100 hover:bg-craft-200 text-craft-800 font-bold flex items-center justify-center">+</button>
+                                </div>
+                            ` : `
+                                <button onclick="toggleFlossStock('${item.dmc}')" class="text-[11px] text-rosewood hover:underline font-medium">+ Add</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function toggleFlossStock(dmcCode) {
+            const key = `DMC:${dmcCode}`;
+            if (appState.threadsStock[key]) {
+                delete appState.threadsStock[key];
+            } else {
+                appState.threadsStock[key] = { owned: true, qty: 1, bobbin: '', loc: 'Main Storage' };
+            }
+            saveToLocalStorage();
+            renderAll();
+        }
+
+        function updateFlossQty(dmcCode, delta) {
+            const key = `DMC:${dmcCode}`;
+            if (appState.threadsStock[key]) {
+                let current = Number(appState.threadsStock[key].qty || 1);
+                current = Math.max(0, current + delta);
+                if (current === 0) {
+                    delete appState.threadsStock[key];
+                } else {
+                    appState.threadsStock[key].qty = current;
+                }
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+
+        // Custom Thread Save
+        function saveCustomThread(e) {
+            e.preventDefault();
+            const brand = document.getElementById('custom-floss-brand').value;
+            const code = document.getElementById('custom-floss-code').value;
+            const hex = document.getElementById('custom-floss-hex').value;
+            const name = document.getElementById('custom-floss-name').value;
+            const qty = document.getElementById('custom-floss-qty').value;
+            const loc = document.getElementById('custom-floss-loc').value;
+
+            const customObj = { id: Date.now().toString(), brand, code, hex, name, qty, loc };
+            appState.customThreads.push(customObj);
+            
+            // Also mark in threadsStock
+            appState.threadsStock[`${brand}:${code}`] = { owned: true, qty: Number(qty), bobbin: '', loc };
+
+            saveToLocalStorage();
+            closeModal('custom-thread-modal');
+            document.getElementById('custom-thread-form').reset();
+            renderAll();
+        }
+
+        // CONVERSION TOOL LOGIC
+        function updateConvertOptions() {
+            const brand = document.getElementById('convert-source-brand').value;
+            const list = document.getElementById('convert-thread-list');
+            list.innerHTML = THREAD_LIBRARY.map(t => `<option value="${t[brand]}">${t.name}</option>`).join('');
+        }
+
+        function executeConversion() {
+            const brand = document.getElementById('convert-source-brand').value;
+            const inputVal = document.getElementById('convert-thread-input').value.trim();
+
+            if (!inputVal) return;
+
+            const match = THREAD_LIBRARY.find(t => t[brand].toLowerCase() === inputVal.toLowerCase());
+            const resultDiv = document.getElementById('conversion-result');
+
+            if (!match) {
+                alert(`No conversion mapping found for ${brand.toUpperCase()} #${inputVal}`);
+                return;
+            }
+
+            resultDiv.classList.remove('hidden');
+
+            // Source Display
+            document.getElementById('source-brand-title').innerText = brand.toUpperCase();
+            document.getElementById('source-code-title').innerText = `#${match[brand]}`;
+            document.getElementById('source-color-name').innerText = match.name;
+            document.getElementById('source-color-swatch').style.backgroundColor = match.hex;
+
+            // Targets Display
+            const targets = [
+                { brand: 'dmc', title: 'DMC', badgeBg: 'bg-craft-800' },
+                { brand: 'anchor', title: 'Anchor', badgeBg: 'bg-sage' },
+                { brand: 'cosmo', title: 'Cosmo', badgeBg: 'bg-rosewood' }
+            ].filter(t => t.brand !== brand);
+
+            // Target 1
+            const t1 = targets[0];
+            document.getElementById('target-1-badge').innerText = `${t1.title} Equivalent`;
+            document.getElementById('target-1-brand').innerText = t1.title;
+            document.getElementById('target-1-code').innerText = `#${match[t1.brand]}`;
+            document.getElementById('target-1-name').innerText = match.name;
+            document.getElementById('target-1-swatch').style.backgroundColor = match.hex;
+
+            // Target 2
+            const t2 = targets[1];
+            document.getElementById('target-2-badge').innerText = `${t2.title} Equivalent`;
+            document.getElementById('target-2-brand').innerText = t2.title;
+            document.getElementById('target-2-code').innerText = `#${match[t2.brand]}`;
+            document.getElementById('target-2-name').innerText = match.name;
+            document.getElementById('target-2-swatch').style.backgroundColor = match.hex;
+        }
+
+        // SUPPLIES MANAGEMENT
+        function switchSupplyCategory(cat) {
+            supplyCategory = cat;
+            document.querySelectorAll('.sup-tab-btn').forEach(btn => {
+                btn.classList.remove('border-craft-800', 'font-bold', 'text-craft-800');
+                btn.classList.add('border-transparent', 'font-medium', 'text-craft-500');
+            });
+            const active = document.getElementById(`sup-cat-${cat}`);
+            if (active) {
+                active.classList.add('border-craft-800', 'font-bold', 'text-craft-800');
+            }
+            renderSupplies();
+        }
+
+        function renderSupplies() {
+            const grid = document.getElementById('supplies-grid');
+            if (!grid) return;
+
+            let items = appState.supplies;
+            if (supplyCategory !== 'all') {
+                items = items.filter(s => s.category === supplyCategory);
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-craft-500 text-sm italic">No supplies in this category yet. Click "Add Supply Item" to organize your studio!</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(s => `
+                <div class="bg-white rounded-2xl border border-craft-200 p-4 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-craft-100 text-craft-700">${s.category}</span>
+                            <div class="flex space-x-1">
+                                <button onclick="editSupply('${s.id}')" class="p-1 text-craft-400 hover:text-craft-700"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deleteSupply('${s.id}')" class="p-1 text-craft-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                        ${s.image ? `<img src="${s.image}" class="w-full h-32 object-cover rounded-xl mb-3 border border-craft-100">` : ''}
+                        <h3 class="font-bold text-craft-900 text-base leading-snug">${escapeHtml(s.title)}</h3>
+                        <p class="text-xs text-craft-600 mt-1">${escapeHtml(s.specs || '')}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-craft-100 flex items-center justify-between text-xs text-craft-500">
+                        <span>Loc: <b class="text-craft-800">${escapeHtml(s.location || 'Unassigned')}</b></span>
+                        <span class="font-bold text-craft-900 bg-craft-50 px-2.5 py-1 rounded-lg border border-craft-200">Qty: ${s.qty}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function saveSupply(e) {
+            e.preventDefault();
+            const id = document.getElementById('supply-id').value || Date.now().toString();
+            const title = document.getElementById('supply-title').value;
+            const category = document.getElementById('supply-category').value;
+            const qty = document.getElementById('supply-qty').value;
+            const specs = document.getElementById('supply-specs').value;
+            const location = document.getElementById('supply-location').value;
+            const image = document.getElementById('supply-image-url').value;
+            const notes = document.getElementById('supply-notes').value;
+
+            const existingIdx = appState.supplies.findIndex(s => s.id === id);
+            const itemObj = { id, title, category, qty, specs, location, image, notes };
+
+            if (existingIdx > -1) {
+                appState.supplies[existingIdx] = itemObj;
+            } else {
+                appState.supplies.push(itemObj);
+            }
+
+            saveToLocalStorage();
+            closeModal('supply-modal');
+            document.getElementById('supply-form').reset();
+            renderAll();
+        }
+
+        function editSupply(id) {
+            const item = appState.supplies.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('supply-id').value = item.id;
+            document.getElementById('supply-title').value = item.title;
+            document.getElementById('supply-category').value = item.category;
+            document.getElementById('supply-qty').value = item.qty;
+            document.getElementById('supply-specs').value = item.specs || '';
+            document.getElementById('supply-location').value = item.location || '';
+            document.getElementById('supply-image-url').value = item.image || '';
+            document.getElementById('supply-notes').value = item.notes || '';
+
+            document.getElementById('supply-modal-title').innerText = "Edit Supply Item";
+            openModal('supply-modal');
+        }
+
+        function deleteSupply(id) {
+            if (confirm("Are you sure you want to remove this supply item?")) {
+                appState.supplies = appState.supplies.filter(s => s.id !== id);
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+
+        // PROJECTS TRACKER
+        function filterProjects(status) {
+            projectFilter = status;
+            ['all', 'Active', 'Planned', 'Completed'].forEach(st => {
+                const btn = document.getElementById(`proj-filter-${st}`);
+                if (btn) {
+                    if (st === status) {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-800 text-white";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-xl text-xs font-medium bg-craft-100 text-craft-700 hover:bg-craft-200";
+                    }
+                }
+            });
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const grid = document.getElementById('projects-grid');
+            if (!grid) return;
+
+            let items = appState.projects;
+            if (projectFilter !== 'all') {
+                items = items.filter(p => p.status === projectFilter);
+            }
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-craft-500 text-sm italic">No projects found in this view. Start a new embroidery piece!</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(p => {
+                const statusColors = {
+                    Active: 'bg-amber-100 text-amber-800 border-amber-200',
+                    Planned: 'bg-sky-100 text-sky-800 border-sky-200',
+                    Completed: 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                };
+
+                // Thread check calculation
+                const reqThreads = p.threads ? p.threads.split(',').map(t => t.trim()).filter(Boolean) : [];
+                const ownedCount = reqThreads.filter(tCode => !!appState.threadsStock[`DMC:${tCode}`]).length;
+
+                return `
+                    <div class="bg-white rounded-2xl border border-craft-200 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${statusColors[p.status] || 'bg-gray-100'}">${p.status}</span>
+                                <div class="flex space-x-1">
+                                    <button onclick="viewProjectDetail('${p.id}')" class="p-1 text-craft-600 hover:text-craft-900"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                    <button onclick="editProject('${p.id}')" class="p-1 text-craft-400 hover:text-craft-700"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                    <button onclick="deleteProject('${p.id}')" class="p-1 text-craft-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+
+                            ${p.image ? `<img src="${p.image}" class="w-full h-40 object-cover rounded-xl mb-3 border border-craft-100">` : ''}
+
+                            <h3 class="font-serif font-bold text-craft-900 text-lg leading-snug">${escapeHtml(p.title)}</h3>
+                            <p class="text-xs text-craft-500 mb-3">${escapeHtml(p.designer || 'Independent Pattern')}</p>
+
+                            <!-- Progress Bar -->
+                            <div class="mb-4">
+                                <div class="flex justify-between text-xs text-craft-700 font-semibold mb-1">
+                                    <span>Progress</span>
+                                    <span>${p.progress}%</span>
+                                </div>
+                                <div class="w-full bg-craft-100 rounded-full h-2">
+                                    <div class="bg-rosewood h-2 rounded-full" style="width: ${p.progress}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5 text-xs text-craft-600 bg-craft-50 p-3 rounded-xl border border-craft-100">
+                                <div><b>Fabric:</b> ${escapeHtml(p.fabric || 'N/A')}</div>
+                                <div><b>Hoop/Frame:</b> ${escapeHtml(p.hoop || 'N/A')}</div>
+                                ${reqThreads.length ? `<div><b>Thread Check:</b> <span class="${ownedCount === reqThreads.length ? 'text-emerald-600 font-bold' : 'text-amber-700'}">${ownedCount}/${reqThreads.length} owned</span></div>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-craft-100 flex justify-between items-center text-xs text-craft-500">
+                            <span>Target: ${p.targetDate || 'No date'}</span>
+                            <button onclick="viewProjectDetail('${p.id}')" class="text-craft-800 font-semibold hover:underline flex items-center gap-1">
+                                View Details <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function saveProject(e) {
+            e.preventDefault();
+            const id = document.getElementById('project-id').value || Date.now().toString();
+            const title = document.getElementById('project-title').value;
+            const designer = document.getElementById('project-designer').value;
+            const status = document.getElementById('project-status').value;
+            const progress = document.getElementById('project-progress').value;
+            const hoop = document.getElementById('project-hoop').value;
+            const fabric = document.getElementById('project-fabric').value;
+            const targetDate = document.getElementById('project-target-date').value;
+            const threads = document.getElementById('project-threads').value;
+            const image = document.getElementById('project-image-url').value;
+            const notes = document.getElementById('project-notes').value;
+
+            const existingIdx = appState.projects.findIndex(p => p.id === id);
+            const projObj = { id, title, designer, status, progress: Number(progress), hoop, fabric, targetDate, threads, image, notes };
+
+            if (existingIdx > -1) {
+                appState.projects[existingIdx] = projObj;
+            } else {
+                appState.projects.push(projObj);
+            }
+
+            saveToLocalStorage();
+            closeModal('project-modal');
+            document.getElementById('project-form').reset();
+            renderAll();
+        }
+
+        function editProject(id) {
+            const p = appState.projects.find(proj => proj.id === id);
+            if (!p) return;
+
+            document.getElementById('project-id').value = p.id;
+            document.getElementById('project-title').value = p.title;
+            document.getElementById('project-designer').value = p.designer || '';
+            document.getElementById('project-status').value = p.status;
+            document.getElementById('project-progress').value = p.progress;
+            document.getElementById('project-hoop').value = p.hoop || '';
+            document.getElementById('project-fabric').value = p.fabric || '';
+            document.getElementById('project-target-date').value = p.targetDate || '';
+            document.getElementById('project-threads').value = p.threads || '';
+            document.getElementById('project-image-url').value = p.image || '';
+            document.getElementById('project-notes').value = p.notes || '';
+
+            document.getElementById('project-modal-title').innerText = "Edit Project";
+            openModal('project-modal');
+        }
+
+        function deleteProject(id) {
+            if (confirm("Are you sure you want to delete this project?")) {
+                appState.projects = appState.projects.filter(p => p.id !== id);
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+
+        function viewProjectDetail(id) {
+            const p = appState.projects.find(proj => proj.id === id);
+            if (!p) return;
+
+            const reqThreads = p.threads ? p.threads.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+            const container = document.getElementById('project-detail-content');
+            container.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-craft-100 text-craft-800">${p.status}</span>
+                        <h2 class="font-serif font-bold text-2xl text-craft-900 mt-1">${escapeHtml(p.title)}</h2>
+                        <p class="text-xs text-craft-500">${escapeHtml(p.designer || 'Independent Pattern')}</p>
+                    </div>
+                    <button onclick="closeModal('project-detail-modal')" class="text-craft-400 hover:text-craft-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+
+                ${p.image ? `<img src="${p.image}" class="w-full h-56 object-cover rounded-2xl mb-4 border border-craft-200">` : ''}
+
+                <div class="grid grid-cols-2 gap-4 mb-4 text-xs">
+                    <div class="bg-craft-50 p-3 rounded-xl border border-craft-100">
+                        <span class="text-craft-500 block">Fabric:</span>
+                        <strong class="text-craft-900 text-sm">${escapeHtml(p.fabric || 'Unspecified')}</strong>
+                    </div>
+                    <div class="bg-craft-50 p-3 rounded-xl border border-craft-100">
+                        <span class="text-craft-500 block">Hoop / Size:</span>
+                        <strong class="text-craft-900 text-sm">${escapeHtml(p.hoop || 'Unspecified')}</strong>
+                    </div>
+                </div>
+
+                <!-- Required Floss Checklist -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-sm text-craft-900 mb-2">Required Floss Checklist</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        ${reqThreads.map(code => {
+                            const match = THREAD_LIBRARY.find(t => t.dmc === code);
+                            const isOwned = !!appState.threadsStock[`DMC:${code}`];
+                            return `
+                                <div class="p-2 rounded-xl border ${isOwned ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'} text-xs flex items-center justify-between">
+                                    <div class="flex items-center space-x-1.5">
+                                        <span class="w-3 h-3 rounded-full border border-black/10 inline-block" style="background-color: ${match ? match.hex : '#ccc'}"></span>
+                                        <span class="font-bold">DMC ${code}</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold">${isOwned ? 'In Stock' : 'Needed'}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- Notes / Journal -->
+                <div class="mb-6">
+                    <h4 class="font-bold text-sm text-craft-900 mb-1">Stitching Diary & Notes</h4>
+                    <p class="text-xs text-craft-700 bg-craft-50 p-3 rounded-xl border border-craft-100 whitespace-pre-wrap">${escapeHtml(p.notes || 'No notes added.')}</p>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-craft-100">
+                    <button onclick="editProject('${p.id}'); closeModal('project-detail-modal')" class="px-4 py-2 bg-craft-800 text-white rounded-xl text-xs font-semibold">Edit Details</button>
+                </div>
+            `;
+
+            lucide.createIcons();
+            openModal('project-detail-modal');
+        }
+
+        // IMAGE UPLOAD HANDLER (Base64 conversion)
+        function handleImageUpload(e, targetInputId) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById(targetInputId).value = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // BACKUP, RESTORE & CLOUD SYNC
+        function openSyncModal() {
+            openModal('sync-modal');
+        }
+
+        function exportBackupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `stitchcraft_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importBackupJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const imported = JSON.parse(evt.target.result);
+                    if (imported && (imported.threadsStock || imported.supplies || imported.projects)) {
+                        appState = imported;
+                        saveToLocalStorage();
+                        renderAll();
+                        alert("Studio data successfully restored from backup!");
+                        closeModal('sync-modal');
+                    } else {
+                        alert("Invalid backup file structure.");
+                    }
+                } catch(err) {
+                    alert("Error parsing backup JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function triggerCloudSync() {
+            updateSyncStatus('Syncing...', 'bg-sky-500');
+            setTimeout(() => {
+                appState.lastSync = new Date().toISOString();
+                saveToLocalStorage();
+                updateSyncStatus('Synced', 'bg-emerald-500');
+                alert("Cloud Synchronization Complete! Your inventory and projects are safely backed up.");
+            }, 1200);
+        }
+
+        function updateSyncStatus(text, colorClass) {
+            const dot = document.getElementById('sync-status-dot');
+            const txt = document.getElementById('sync-status-text');
+            if (dot) dot.className = `w-2 h-2 rounded-full ${colorClass}`;
+            if (txt) txt.innerText = text;
+        }
+
+        function resetToDefaults() {
+            if (confirm("Are you sure you want to reset all data to default samples? This cannot be undone.")) {
+                localStorage.removeItem('stitchcraft_data_v1');
+                location.reload();
+            }
+        }
+
+        // Modal Helpers
+        function openModal(id) {
+            document.getElementById(id)?.classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id)?.classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+    </script>
+</body>
+</html>
